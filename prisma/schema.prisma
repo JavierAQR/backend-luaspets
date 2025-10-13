@@ -20,6 +20,8 @@ model User {
   password  String
   email     String   @unique
   role      Role    @default(USER)
+  address      String?          // ← campo opcional
+  profileImage String?          // ← campo opcional (URL o base64)
   createdAt DateTime @default(now())
 }
 
