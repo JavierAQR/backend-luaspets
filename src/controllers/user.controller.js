@@ -1,5 +1,9 @@
 import * as userService from '../services/user.service.js'
 
+export const getProfile = async (req, res) => {
+  res.json(req.user)
+}
+
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id // setear por authMiddleware
