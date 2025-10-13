@@ -6,11 +6,21 @@ import { EMAIL_PASS, EMAIL_USER } from '../config/config.js'
 
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS || '10')
 
-export const register = async ({ name, lastname, phoneNumber, password, email }) => {
-  if (!name || !email || !password) throw new Error('Todos los campos son requeridos')
+export const register = async ({
+  name,
+  lastname,
+  phoneNumber,
+  password,
+  email
+}) => {
+  if (!name || !email || !password) { throw new Error('Todos los campos son requeridos') }
 
   const existing = await prisma.user.findUnique({ where: { email } })
-  if (existing) throw new Error('El correo ingresado ya está asociado a un usuario existente')
+  if (existing) {
+    throw new Error(
+      'El correo ingresado ya está asociado a un usuario existente'
+    )
+  }
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS)
   const user = await prisma.user.create({
@@ -29,7 +39,16 @@ export const login = async ({ email, password }) => {
 
   const token = generateToken(user)
 
-  return { user: { id: user.id, name: user.name, lastname: user.lastname, email: user.email, phoneNumber: user.phoneNumber }, token }
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      lastname: user.lastname,
+      email: user.email,
+      phoneNumber: user.phoneNumber
+    },
+    token
+  }
 }
 
 export const updatePassword = async (userId, oldPassword, newPassword) => {
@@ -40,7 +59,10 @@ export const updatePassword = async (userId, oldPassword, newPassword) => {
   if (!valid) throw new Error('Contraseña original incorrecta')
 
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS)
-  await prisma.user.update({ where: { id: userId }, data: { password: hashed } })
+  await prisma.user.update({
+    where: { id: userId },
+    data: { password: hashed }
+  })
 }
 
 export const recoverPassword = async (email) => {
@@ -90,11 +112,17 @@ export const recoverPassword = async (email) => {
 export const resetPassword = async (email, code, newPassword) => {
   const record = await prisma.passwordReset.findUnique({ where: { email } })
 
-  if (!record) { throw new Error('No existe una solicitud con este correo electrónico') }
+  if (!record) {
+    throw new Error('No existe una solicitud con este correo electrónico')
+  }
 
-  if (record.code !== code) { throw new Error('Código inválido') }
+  if (record.code !== code) {
+    throw new Error('Código inválido')
+  }
 
-  if (record.expiresAt < new Date()) { throw new Error('El código ha expirado') }
+  if (record.expiresAt < new Date()) {
+    throw new Error('El código ha expirado')
+  }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10)
 
