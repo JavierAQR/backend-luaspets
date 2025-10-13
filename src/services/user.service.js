@@ -2,6 +2,23 @@ import cloudinary from '../config/cloudinary.js'
 import streamifier from 'streamifier'
 import prisma from '../models/db.js'
 
+export const getProfile = async (userId) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      lastname: true,
+      email: true,
+      phoneNumber: true,
+      address: true,
+      profileImage: true,
+      createdAt: true
+    }
+  })
+  return user
+}
+
 async function uploadToCloudinary (buffer, folder = 'veterinaria/users', publicId = undefined) {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(

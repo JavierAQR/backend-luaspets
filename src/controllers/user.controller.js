@@ -1,7 +1,19 @@
 import * as userService from '../services/user.service.js'
 
 export const getProfile = async (req, res) => {
-  res.json(req.user)
+  try {
+    const userId = req.user.id
+    const user = await userService.getProfile(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' })
+    }
+
+    res.json(user)
+  } catch (err) {
+    console.error('getProfile error:', err)
+    res.status(500).json({ message: 'Error obteniendo perfil' })
+  }
 }
 
 export const updateProfile = async (req, res) => {
