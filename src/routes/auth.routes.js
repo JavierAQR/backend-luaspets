@@ -10,6 +10,5 @@ router.post('/logout', authController.logout)
 router.post('/update-password', authMiddleware, authController.updatePassword)
 router.post('/recover-password', authController.recoverPassword)
 router.post('/reset-password', authController.resetPassword)
-router.get('/profile', authMiddleware, authController.getProfile)
 
 export default router

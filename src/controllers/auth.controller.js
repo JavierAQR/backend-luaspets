@@ -44,10 +44,6 @@ export const recoverPassword = async (req, res) => {
   }
 }
 
-export const getProfile = async (req, res) => {
-  res.json(req.user)
-}
-
 export const resetPassword = async (req, res) => {
   try {
     const { email, code, newPassword } = req.body
