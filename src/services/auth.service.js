@@ -32,10 +32,10 @@ export const register = async ({
 
 export const login = async ({ email, password }) => {
   const user = await prisma.user.findUnique({ where: { email } })
-  if (!user) throw new Error('Usuario no encontrado')
+  if (!user) throw new Error('El correo o la contraseña son incorrectos.')
 
   const isValid = await bcrypt.compare(password, user.password)
-  if (!isValid) throw new Error('El correo o la contraseña son incorrectos')
+  if (!isValid) throw new Error('El correo o la contraseña son incorrectos.')
 
   const token = generateToken(user)
 
@@ -45,7 +45,8 @@ export const login = async ({ email, password }) => {
       name: user.name,
       lastname: user.lastname,
       email: user.email,
-      phoneNumber: user.phoneNumber
+      phoneNumber: user.phoneNumber,
+      role: user.role
     },
     token
   }
