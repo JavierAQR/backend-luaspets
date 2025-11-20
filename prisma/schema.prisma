@@ -12,6 +12,35 @@ enum Role {
   USER
 }
 
+// Tipo de producto físico que vendes
+enum ProductCategory {
+  ACCESSORY   // Accesorios
+  FOOD        // Alimentos
+  TOY         // Juguetes
+}
+
+// Tipo de servicio que ofreces
+enum ServiceType {
+  GROOMING
+  CONSULTATION
+  VACCINE
+}
+
+// Estado de una cita
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+// Sexo de la mascota (opcional, por si lo quieres usar)
+enum PetSex {
+  MALE
+  FEMALE
+  OTHER
+}
+
 model User {
   id        String   @id @default(uuid())
   name      String 
@@ -23,11 +52,128 @@ model User {
   address      String?         
   profileImage String?
   profileImagePublicId  String?         
+
   createdAt DateTime @default(now())
+  updatedAt DateTime?   @updatedAt
+
+  pets         Pet[]
+  appointments Appointment[]
+  carts        Cart[]
 }
 
 model PasswordReset {
   email     String  @id
   code      String
   expiresAt DateTime
+}
+
+model Pet {
+  id        String   @id @default(uuid())
+  name      String
+  species   String      // Perro, gato, etc. (o podrías usar un enum)
+  breed     String?
+  sex       PetSex?
+  birthDate DateTime?
+  weightKg  Float?
+  notes     String?
+
+  imageUrl        String?
+  imagePublicId   String?
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String
+
+  appointments Appointment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  type        ServiceType
+  durationMin Int?          // duración estimada
+  price       Decimal       @db.Decimal(10, 2)
+
+  imageUrl        String    // URL de Cloudinary
+  imagePublicId   String    // public_id de Cloudinary
+
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  appointments Appointment[]
+}
+
+model Product {
+  id          String          @id @default(uuid())
+  name        String
+  description String?
+  category    ProductCategory
+  price       Decimal         @db.Decimal(10, 2)
+  stock       Int             @default(0)   // inventario
+  isActive    Boolean         @default(true)
+
+  imageUrl        String      // URL de Cloudinary
+  imagePublicId   String      // public_id de Cloudinary
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  cartItems   CartItem[]
+}
+
+model Appointment {
+  id        String            @id @default(uuid())
+  
+  // quién reservó
+  user      User              @relation(fields: [userId], references: [id])
+  userId    String
+
+  // para qué mascota es la cita
+  pet       Pet               @relation(fields: [petId], references: [id])
+  petId     String
+
+  // qué servicio se realizará en esa cita
+  service   Service           @relation(fields: [serviceId], references: [id])
+  serviceId String
+
+  date      DateTime          // fecha y hora de la cita
+  status    AppointmentStatus @default(PENDING)
+  reason    String?           // motivo que escribe el usuario
+  notes     String?           // notas internas o de seguimiento
+
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String
+
+  isActive  Boolean    @default(true) // cuando "compras" podrías desactivarlo
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items     CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartId    String
+
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+
+  quantity  Int      @default(1)
+  // Guardas el precio al momento de agregarlo al carrito
+  unitPrice Decimal  @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
