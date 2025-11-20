@@ -1,5 +1,8 @@
 import prisma from '../models/db.js'
-import { uploadBufferToCloudinary, deleteFromCloudinary } from '../utils/cloudinary.js'
+import {
+  uploadBufferToCloudinary,
+  deleteFromCloudinary
+} from '../utils/cloudinary.js'
 
 export async function getAllProducts () {
   return prisma.product.findMany({
@@ -75,7 +78,10 @@ export async function updateProduct (id, data, file) {
       stock: data.stock ? parseInt(data.stock) : existing.stock,
       imageUrl,
       imagePublicId,
-      isActive: data.isActive !== undefined ? data.isActive : existing.isActive
+      isActive:
+        data.isActive !== undefined
+          ? data.isActive === 'true'
+          : existing.isActive
     }
   })
 }

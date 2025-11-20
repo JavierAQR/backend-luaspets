@@ -10,7 +10,8 @@ export const generateToken = (user) => {
       lastname: user.lastname,
       phoneNumber: user.phoneNumber,
       address: user.address,
-      profileImage: user.profileImage
+      profileImage: user.profileImage,
+      role: user.role
     },
     SECRET_JWT_KEY,
     { expiresIn: '1h' }
