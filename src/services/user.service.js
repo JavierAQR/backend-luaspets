@@ -13,7 +13,8 @@ export const getProfile = async (userId) => {
       phoneNumber: true,
       address: true,
       profileImage: true,
-      createdAt: true
+      createdAt: true,
+      role: true
     }
   })
   return user
