@@ -8,6 +8,7 @@ import cartRoutes from './routes/cart.routes.js'
 import petRoutes from './routes/pet.routes.js'
 import productRoutes from './routes/product.routes.js'
 import serviceRoutes from './routes/service.routes.js'
+import dashboardRoutes from './routes/dashboard.routes.js'
 
 const app = express()
 app.use(cors({ origin: true, credentials: true }))
@@ -22,5 +23,6 @@ app.use('/api/carts', cartRoutes)
 app.use('/api/pets', petRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/services', serviceRoutes)
+app.use('/api/admin/dashboard', dashboardRoutes)
 
 export default app
