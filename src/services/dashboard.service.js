@@ -1,5 +1,5 @@
 // services/dashboard.service.js
-import prisma from '../models/db'
+import prisma from '../models/db.js'
 
 export async function getDashboardSummary () {
   const now = new Date()
