@@ -1,6 +1,7 @@
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import * as orderController from '../controllers/order.controller.js'
 import { Router } from 'express'
+import { adminMiddleware } from '../middlewares/adminMiddleware.js'
 
 const router = Router()
 
@@ -14,5 +15,7 @@ router.get('/me', authMiddleware, orderController.getMyOrders)
 router.get('/:id', authMiddleware, orderController.getOrderById)
 
 router.patch('/:id/complete', authMiddleware, orderController.completeOrder)
+
+router.get('/', authMiddleware, adminMiddleware, orderController.getAllOrders)
 
 export default router

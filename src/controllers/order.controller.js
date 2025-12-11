@@ -46,3 +46,12 @@ export async function completeOrder (req, res, next) {
     next(err)
   }
 }
+
+export async function getAllOrders (req, res, next) {
+  try {
+    const orders = await orderService.getAllOrders()
+    res.json(orders)
+  } catch (err) {
+    next(err)
+  }
+}
