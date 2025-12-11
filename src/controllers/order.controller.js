@@ -33,3 +33,16 @@ export async function getOrderById (req, res, next) {
     next(err)
   }
 }
+
+export async function completeOrder (req, res, next) {
+  try {
+    const userId = req.user.id
+    const orderId = req.params.id
+    const { paypalOrderId } = req.body
+
+    const order = await orderService.completeOrder(userId, orderId, paypalOrderId)
+    res.json(order)
+  } catch (err) {
+    next(err)
+  }
+}

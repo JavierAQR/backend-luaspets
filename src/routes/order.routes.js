@@ -13,4 +13,6 @@ router.get('/me', authMiddleware, orderController.getMyOrders)
 // Ver una orden específica
 router.get('/:id', authMiddleware, orderController.getOrderById)
 
+router.patch('/:id/complete', authMiddleware, orderController.completeOrder)
+
 export default router
