@@ -1,8 +1,8 @@
-import express from 'express'
 import { authMiddleware } from '../middlewares/auth.middleware.js'
 import * as orderController from '../controllers/order.controller.js'
+import { Router } from 'express'
 
-const router = express.Router()
+const router = Router()
 
 // Crear orden desde el carrito
 router.post('/', authMiddleware, orderController.createOrder)
