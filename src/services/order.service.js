@@ -162,3 +162,21 @@ export async function completeOrder (userId, orderId, paypalOrderId) {
     return updatedOrder
   })
 }
+
+export async function getAllOrders () {
+  return prisma.order.findMany({
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          lastname: true,
+          email: true,
+          phoneNumber: true
+        }
+      },
+      items: true
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+}
