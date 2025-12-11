@@ -94,3 +94,27 @@ export async function getOrderById (userId, orderId) {
 
   return order
 }
+
+export async function completeOrder (userId, orderId, paypalOrderId) {
+  const order = await prisma.order.findUnique({ where: { id: orderId } })
+
+  if (!order) {
+    const error = new Error('Orden no encontrada')
+    error.statusCode = 404
+    throw error
+  }
+
+  if (order.userId !== userId) {
+    const error = new Error('No autorizado')
+    error.statusCode = 403
+    throw error
+  }
+
+  return prisma.order.update({
+    where: { id: orderId },
+    data: {
+      status: 'COMPLETED',
+      paypalOrderId
+    }
+  })
+}
