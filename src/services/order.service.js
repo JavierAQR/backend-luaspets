@@ -86,11 +86,11 @@ export async function getOrderById (userId, orderId) {
     throw error
   }
 
-  if (order.userId !== userId) {
+  /*   if (order.userId !== userId) {
     const error = new Error('No tienes permiso para ver esta orden')
     error.statusCode = 403
     throw error
-  }
+  } */
 
   return order
 }
