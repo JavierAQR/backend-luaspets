@@ -41,6 +41,12 @@ enum PetSex {
   OTHER
 }
 
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
 model User {
   id        String   @id @default(uuid())
   name      String 
@@ -59,6 +65,7 @@ model User {
   pets         Pet[]
   appointments Appointment[]
   carts        Cart[]
+  orders       Order[]
 }
 
 model PasswordReset {
@@ -176,4 +183,43 @@ model CartItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  orderNumber   String        @unique
+  
+  user          User          @relation(fields: [userId], references: [id])
+  userId        String
+  
+  // Dirección de envío
+  shippingName     String
+  shippingEmail    String
+  shippingPhone    String
+  shippingAddress  String
+  shippingCity     String
+  shippingNotes    String?
+  
+  // Pago
+  total         Decimal       @db.Decimal(10, 2)
+  paypalOrderId String?
+  status        OrderStatus   @default(PENDING)
+  
+  createdAt     DateTime      @default(now())
+  
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String
+  
+  productName String
+  productImage String
+  quantity    Int
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  
+  createdAt   DateTime @default(now())
 }
