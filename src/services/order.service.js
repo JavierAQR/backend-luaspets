@@ -96,25 +96,69 @@ export async function getOrderById (userId, orderId) {
 }
 
 export async function completeOrder (userId, orderId, paypalOrderId) {
-  const order = await prisma.order.findUnique({ where: { id: orderId } })
+  return await prisma.$transaction(async (tx) => {
+    // 1. Obtener orden con items
+    const order = await tx.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: true
+      }
+    })
 
-  if (!order) {
-    const error = new Error('Orden no encontrada')
-    error.statusCode = 404
-    throw error
-  }
-
-  if (order.userId !== userId) {
-    const error = new Error('No autorizado')
-    error.statusCode = 403
-    throw error
-  }
-
-  return prisma.order.update({
-    where: { id: orderId },
-    data: {
-      status: 'COMPLETED',
-      paypalOrderId
+    if (!order) {
+      const error = new Error('Orden no encontrada')
+      error.statusCode = 404
+      throw error
     }
+
+    if (order.userId !== userId) {
+      const error = new Error('No autorizado')
+      error.statusCode = 403
+      throw error
+    }
+
+    if (order.status === 'COMPLETED') {
+      // evitar doble descuento de stock
+      return order
+    }
+
+    // 2. Restar stock de cada producto comprado
+    for (const item of order.items) {
+      // buscar producto por nombre o relacionarlo mejor si tienes productId
+      const product = await tx.product.findFirst({
+        where: { name: item.productName }
+      })
+
+      if (!product) {
+        throw new Error(`Producto no encontrado: ${item.productName}`)
+      }
+
+      const newStock = product.stock - item.quantity
+
+      if (newStock < 0) {
+        throw new Error(
+            `Stock insuficiente para: ${item.productName}. Disponible: ${product.stock}`
+        )
+      }
+
+      // actualizar stock
+      await tx.product.update({
+        where: { id: product.id },
+        data: {
+          stock: newStock
+        }
+      })
+    }
+
+    // 3. Actualizar orden como completada
+    const updatedOrder = await tx.order.update({
+      where: { id: orderId },
+      data: {
+        status: 'COMPLETED',
+        paypalOrderId
+      }
+    })
+
+    return updatedOrder
   })
 }
